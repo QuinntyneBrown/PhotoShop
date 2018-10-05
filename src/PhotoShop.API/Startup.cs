@@ -32,11 +32,9 @@ namespace PhotoShop.API
             services.AddSingleton<IRepository, Repository>();
             services.AddSingleton<ICommandPreProcessor, CommandPreProcessor>();
             services.AddSingleton<ICommandRegistry, CommandRegistry>();
-
+            services.AddSingleton<IEventStoreMessageQueue, EventStoreMessageQueue>();
             services.AddHttpContextAccessor();
-            services.AddHostedService<QueuedHostedService>();
-            services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
-
+            services.AddHostedService<EventStoreMessageProcessor>();
             services.AddCustomMvc()
                 .AddFluentValidation(cfg => { cfg.RegisterValidatorsFromAssemblyContaining<Startup>(); });
 
@@ -50,7 +48,7 @@ namespace PhotoShop.API
                 .AddMediatR(typeof(Startup).Assembly);
         }
 
-        public void Configure(IApplicationBuilder app, IBackgroundTaskQueue queue)
+        public void Configure(IApplicationBuilder app)
         {
             var repository = app.ApplicationServices.GetRequiredService<IRepository>() as IRepository;
 
@@ -69,7 +67,7 @@ namespace PhotoShop.API
                 });
 
             if (Configuration.GetValue<bool>("isCI"))
-                new Timer((Object stateInfo) => { Environment.Exit(0); }, null, 1000, 1000);
+                new Timer((object stateInfo) => { Environment.Exit(0); }, null, 1000, 1000);
 
         }
     }

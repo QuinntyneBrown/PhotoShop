@@ -10,7 +10,7 @@ namespace PhotoShop.Infrastructure.Extensions
         public static IServiceCollection AddDataStore(this IServiceCollection services,
                                                string connectionString, bool useInMemoryDatabase = false)
         {
-            services.AddSingleton<IAppDbContext, AppDbContext>();
+            services.AddTransient<IAppDbContext, AppDbContext>();
 
             return services.AddDbContext<AppDbContext>(options =>
             {

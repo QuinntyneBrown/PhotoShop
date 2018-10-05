@@ -1,15 +1,13 @@
-using PhotoShop.Core.Interfaces;
-using PhotoShop.Infrastructure;
-using PhotoShop.Infrastructure.Data;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PhotoShop.Core.Interfaces;
+using PhotoShop.Infrastructure.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace PhotoShop.API
 {
@@ -17,7 +15,6 @@ namespace PhotoShop.API
     {
         public static void Main(string[] args)
         {
-
             var builder = CreateWebHostBuilder();
 
             if(args.Contains("ci"))
@@ -65,9 +62,7 @@ namespace PhotoShop.API
                     context.Database.EnsureCreated();
                     var eventStore = scope.ServiceProvider.GetRequiredService<IEventStore>();
                     var repository = scope.ServiceProvider.GetRequiredService<IRepository>();
-                    var queue = scope.ServiceProvider.GetRequiredService<IBackgroundTaskQueue>();
-                    AppInitializer.Seed(dateTime, eventStore,services, repository);
-                    queue.DequeueAsync(default(CancellationToken)).GetAwaiter().GetResult();
+                    AppInitializer.Seed(dateTime, eventStore, services, repository);
                 }               
             }
         }        

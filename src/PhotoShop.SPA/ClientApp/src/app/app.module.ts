@@ -18,6 +18,8 @@ import { EventsModule } from './events/events.module';
 import { PublicModule } from './public/public.module';
 import { PublicMasterPageComponent } from './public-master-page.component';
 import { ProductsModule } from './products/products.module';
+import { ArticlesModule } from './articles/articles.module';
+import { BlogsModule } from './blogs/blogs.module';
 
 
 @NgModule({
@@ -33,6 +35,8 @@ import { ProductsModule } from './products/products.module';
     CommonModule,
     AppRoutingModule,
 
+    ArticlesModule,
+    BlogsModule,
     CardsModule,
     CoreModule,
     DashboardCardsModule,
@@ -44,7 +48,7 @@ import { ProductsModule } from './products/products.module';
     UsersModule
   ],
   providers: [
-    { provide: baseUrl, useValue: 'http://localhost:3908/' }
+    { provide: baseUrl, useValue: 'http://localhost:3188/' }
   ],
   bootstrap: [AppComponent]
 })

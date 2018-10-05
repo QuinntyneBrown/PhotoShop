@@ -12,6 +12,7 @@ using System.Reactive.Subjects;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using static Newtonsoft.Json.JsonConvert;
+using Newtonsoft.Json;
 
 namespace PhotoShop.Infrastructure.Data
 {
@@ -19,23 +20,23 @@ namespace PhotoShop.Infrastructure.Data
     {
         private readonly IConfiguration _configuration;
         private readonly IDateTime _dateTime;
-        private readonly IBackgroundTaskQueue _queue;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         public Subject<EventStoreChanged> _subject = new Subject<EventStoreChanged>();
+        private readonly IEventStoreMessageQueue _eventStoreMessageQueue;
 
         public static ConcurrentDictionary<Guid, DeserializedStoredEvent> Events { get; set; }        
 
         public EventStore(
             IConfiguration configuration,
+            IEventStoreMessageQueue eventStoreMessageQueue,
             IDateTime dateTime = default(IDateTime),
-            IBackgroundTaskQueue queue = default(IBackgroundTaskQueue),
             IServiceScopeFactory serviceScopeFactory = default(IServiceScopeFactory)
             )
         {
             _configuration = configuration;
-            _queue = queue;
             _serviceScopeFactory = serviceScopeFactory;
             _dateTime = dateTime;
+            _eventStoreMessageQueue = eventStoreMessageQueue;
         }
 
         public async Task<IEnumerable<StoredEvent>> GetEvents() {
@@ -114,15 +115,7 @@ namespace PhotoShop.Infrastructure.Data
 
             _subject.OnNext(new EventStoreChanged(@event));
 
-            _queue?.QueueBackgroundWorkItem(async token =>
-            {
-                using (var scope = _serviceScopeFactory.CreateScope())
-                {
-                    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                    context.StoredEvents.Add(@event);
-                    await context.SaveChangesAsync(token);
-                }
-            });
+            _eventStoreMessageQueue.Enqueue(JsonConvert.SerializeObject(@event));
         }
         
         public void Subscribe(Action<EventStoreChanged> onNext) => _subject.Subscribe(onNext);        

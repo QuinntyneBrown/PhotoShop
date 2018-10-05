@@ -12,31 +12,31 @@ namespace PhotoShop.Infrastructure.Data
 {
     public class Repository : IRepository
     {
-        private ConcurrentDictionary<string, ConcurrentBag<Entity>> _aggregates { get; set; } 
+        private ConcurrentDictionary<string, ConcurrentBag<Entity>> _aggregates { get; set; }
             = new ConcurrentDictionary<string, ConcurrentBag<Entity>>();
 
         public Repository(IEventStore eventStore)
         {
             var events = eventStore.GetEvents().GetAwaiter().GetResult();
 
-            if(events != null)
+            if (events != null)
                 foreach (var @event in events)
                     OnNext(new EventStoreChanged(@event));
-            
+
             eventStore.Subscribe(OnNext);
         }
-        
+
         public void OnNext(EventStoreChanged value)
         {
             var type = Type.GetType(value.Event.AggregateDotNetType);
-            var aggregates = _aggregates.SingleOrDefault(x => x.Key == value.Event.AggregateDotNetType).Value;            
+            var aggregates = _aggregates.SingleOrDefault(x => x.Key == value.Event.AggregateDotNetType).Value;
             var aggregateId = value.Event.StreamId;
 
             if (aggregates != null)
             {
                 Entity e = default(Entity);
                 foreach (var aggregate in aggregates)
-                {                                        
+                {
                     if (value.Event.StreamId == (Guid)type.GetProperty($"{type.Name}Id").GetValue(aggregate, null))
                         e = aggregate;
                 }
@@ -44,8 +44,8 @@ namespace PhotoShop.Infrastructure.Data
                 if (e == default(Entity))
                     e = (Entity)FormatterServices.GetUninitializedObject(Type.GetType(value.Event.AggregateDotNetType));
 
-                
-                e.Apply(JsonConvert.DeserializeObject(value.Event.Data,Type.GetType(value.Event.DotNetType)) as DomainEvent);
+
+                e.Apply(JsonConvert.DeserializeObject(value.Event.Data, Type.GetType(value.Event.DotNetType)) as DomainEvent);
 
                 e.ClearChanges();
 
@@ -61,7 +61,7 @@ namespace PhotoShop.Infrastructure.Data
 
                 _aggregates.TryUpdate(type.AssemblyQualifiedName, newAggregates, aggregates);
             }
-            
+
             if (aggregates == null)
             {
                 var aggregate = (Entity)FormatterServices.GetUninitializedObject(Type.GetType(value.Event.AggregateDotNetType));
@@ -73,10 +73,10 @@ namespace PhotoShop.Infrastructure.Data
                 aggregate.Apply(domainEvent);
 
                 aggregate.ClearChanges();
-                
+
                 _aggregates.TryAdd(value.Event.AggregateDotNetType, aggregates);
 
-            }            
+            }
         }
 
         public TAggregateRoot[] Query<TAggregateRoot>() where TAggregateRoot : Entity
@@ -86,7 +86,7 @@ namespace PhotoShop.Infrastructure.Data
 
             _aggregates.TryGetValue(assemblyQualifiedName, out ConcurrentBag<Entity> aggregates);
 
-            if(aggregates != null)
+            if (aggregates != null)
                 foreach (var a in aggregates)
                     result.Add(a as TAggregateRoot);
 
@@ -106,9 +106,9 @@ namespace PhotoShop.Infrastructure.Data
             foreach (var aggregate in aggregates)
             {
                 if (ids.Contains((Guid)type.GetProperty($"{type.Name}Id").GetValue(aggregate, null)))
-                    result.Add(aggregate as TAggregateRoot);                
+                    result.Add(aggregate as TAggregateRoot);
             }
-            
+
             return result.ToArray();
         }
 
@@ -117,7 +117,7 @@ namespace PhotoShop.Infrastructure.Data
             var type = typeof(TAggregateRoot);
             var result = default(TAggregateRoot);
 
-            foreach(var aggregate in Query<TAggregateRoot>())
+            foreach (var aggregate in Query<TAggregateRoot>())
             {
                 if (id == (Guid)type.GetProperty($"{type.Name}Id").GetValue(aggregate, null))
                     result = aggregate;
