@@ -9,5 +9,6 @@ namespace PhotoShop.Core.Interfaces
     {
         Task<string> TryDequeue();
         void Enqueue(string message);
+        int Count { get; }
     }
 }

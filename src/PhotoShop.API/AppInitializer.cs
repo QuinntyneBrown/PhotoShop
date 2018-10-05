@@ -63,27 +63,7 @@ namespace PhotoShop.API
 
                 eventStore.Save(user);
                 eventStore.Save(dashboard);
-            }
-
-            if (repository.Query<User>().SingleOrDefault(x => x.Username == "ericevans@domainlanguage.com") == null)
-            {
-                var salt = new byte[128 / 8];
-                using (var rng = RandomNumberGenerator.Create())
-                    rng.GetBytes(salt);
-
-                var hashedPassword = new PasswordHasher().HashPassword(salt, "P@ssw0rd");
-
-                var user = new User("ericevans@domainlanguage.com", salt, hashedPassword);
-
-                var adminRole = repository.Query<Role>().Where(x => x.Name == "Mentee").Single(); 
-
-                user.AddRole(adminRole.RoleId);
-
-                var dashboard = new Dashboard("Default", user.UserId);
-
-                eventStore.Save(user);
-                eventStore.Save(dashboard);
-            }
+            }            
         }
     }
     
@@ -132,14 +112,12 @@ namespace PhotoShop.API
     {
         public static void Seed(IDateTime dateTime, IEventStore eventStore, IRepository repository)
         {
-            if (repository.Query<Product>().SingleOrDefault(x => x.Name == "Mentoring") == null)
-                eventStore.Save(new Product("Mentoring", 300, "<p>I provide remote mentoring in area of Software Development to all ages and levels of experience.</p>"));
+            if (repository.Query<Product>().SingleOrDefault(x => x.Name == "Weddings") == null)
+                eventStore.Save(new Product("Weddings", 300, "<p>I provide remote mentoring in area of Software Development to all ages and levels of experience.</p>"));
 
-            if (repository.Query<Product>().SingleOrDefault(x => x.Name == "Training") == null)
-                eventStore.Save(new Product("Training", 300, "<p>I provide invidual training and group training</p>"));
+            if (repository.Query<Product>().SingleOrDefault(x => x.Name == "Events") == null)
+                eventStore.Save(new Product("Events", 300, ""));
 
-            if (repository.Query<Product>().SingleOrDefault(x => x.Name == "Assessments") == null)
-                eventStore.Save(new Product("Assessments", 300, "<p>I provide assements of Developer skills.</p>"));
         }
     }
 }

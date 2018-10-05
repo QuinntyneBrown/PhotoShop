@@ -67,7 +67,7 @@ namespace PhotoShop.API
                 });
 
             if (Configuration.GetValue<bool>("isCI"))
-                new Timer((object stateInfo) => { Environment.Exit(0); }, null, 1000, 1000);
+                new Timer((object stateInfo) => { Environment.Exit(0); }, null, 0, 0);
 
         }
     }
