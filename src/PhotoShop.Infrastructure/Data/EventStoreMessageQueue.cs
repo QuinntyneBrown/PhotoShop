@@ -15,12 +15,13 @@ namespace PhotoShop.Infrastructure.Data
         {
             if (string.IsNullOrEmpty(message))
                 throw new ArgumentNullException(nameof(message));
-
+            
             _messages.Enqueue(message);
 
             _signal.Release();
 
         }
+
         public async Task<string> TryDequeue()
         {
             await _signal.WaitAsync(default(CancellationToken));
@@ -29,5 +30,7 @@ namespace PhotoShop.Infrastructure.Data
 
             return await Task.FromResult(result);
         }
+
+        public int Count => _messages.Count;
     }
 }

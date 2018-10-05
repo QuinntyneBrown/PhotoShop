@@ -19,20 +19,19 @@
 
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
+    <Compile Remove="xClientApp\**" />
     <Content Remove="$(SpaRoot)**" />
+    <Content Remove="xClientApp\**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="ClientApp\src\app\registry.ts" />
+    <EmbeddedResource Remove="xClientApp\**" />
+    <None Remove="xClientApp\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ClientApp\src\app\mentees\" />
-    <Folder Include="ClientApp\src\app\events\" />
     <Folder Include="ClientApp\src\app\digital-assets\" />
-    <Folder Include="ClientApp\src\app\shopping-carts\" />
-    <Folder Include="ClientApp\src\app\products\" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

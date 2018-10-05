@@ -1,11 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
-using PhotoShop.Core.Common;
 using PhotoShop.Core.Interfaces;
 using PhotoShop.Core.Models;
-using System;
-using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
